@@ -11,7 +11,10 @@ import java.util.List;
 
 public class TareaDAO {
 
-    private Connection conn= Conexion.getInstance().getConnection();
+
+    // Formato de fecha y hora ajustado para coincidir con el formato de la base de datos
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     // Método para obtener todas las tareas
     public List<Tarea> getAllTareas() {
@@ -19,16 +22,15 @@ public class TareaDAO {
         String query = "SELECT * FROM Tarea";
 
         try {
-        PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery();
+            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
+            ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 Tarea tarea = extractTareaFromResultSet(rs);
                 tareas.add(tarea);
             }
 
-        } catch (
-    SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return tareas;
@@ -40,7 +42,7 @@ public class TareaDAO {
         String query = "SELECT * FROM Tarea WHERE id = ?";
 
         try {
-             PreparedStatement pstmt = conn.prepareStatement(query);
+            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
 
             pstmt.setInt(1, id);
 
@@ -61,7 +63,7 @@ public class TareaDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
-             PreparedStatement pstmt = conn.prepareStatement(query);
+            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
 
             setTareaParameters(pstmt, tarea);
             pstmt.executeUpdate();
@@ -76,7 +78,7 @@ public class TareaDAO {
                 "WHERE id = ?";
 
         try {
-             PreparedStatement pstmt = conn.prepareStatement(query);
+            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
 
             setTareaParameters(pstmt, tarea);
             pstmt.setInt(11, tarea.getId());
@@ -91,7 +93,7 @@ public class TareaDAO {
         String query = "DELETE FROM Tarea WHERE id = ?";
 
         try {
-             PreparedStatement pstmt = conn.prepareStatement(query);
+            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -99,9 +101,6 @@ public class TareaDAO {
             e.printStackTrace();
         }
     }
-
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     // Método para extraer una tarea desde un ResultSet
     private Tarea extractTareaFromResultSet(ResultSet rs) throws SQLException {
@@ -120,7 +119,7 @@ public class TareaDAO {
         LocalDateTime fechaFinalizacion = parseDateTime(fechaFinalizacionStr);
 
         int usuarioCreadorx = rs.getInt("usuarioCreador");
-        String usuarioCreador = usuarioCreadorx+"";
+        String usuarioCreador = usuarioCreadorx + "";
         int usuarioResponsable = rs.getInt("usuarioResponsable");
         boolean completada = rs.getBoolean("completada");
         Tarea.Prioridad prioridad = Tarea.Prioridad.valueOf(rs.getString("prioridad"));
@@ -133,7 +132,11 @@ public class TareaDAO {
     // Método para convertir un String a LocalDateTime
     private LocalDateTime parseDateTime(String dateTimeStr) {
         if (dateTimeStr != null && !dateTimeStr.isEmpty()) {
-            return LocalDateTime.parse(dateTimeStr, FORMATTER);
+            try {
+                return LocalDateTime.parse(dateTimeStr, FORMATTER);
+            }catch (Exception e){
+                return LocalDateTime.parse(dateTimeStr, FORMATTER2);
+            }
         }
         return null;
     }
@@ -148,7 +151,7 @@ public class TareaDAO {
         List<Usuario> usuarios = new UsuariosDAO(Conexion.getInstance().getConnection()).obtenerTodosLosUsuarios();
         int idCreador = 0;
         for (int i = 0; i < usuarios.size(); i++) {
-            if(usuarios.get(i).getNombre().equals(tarea.getUsuarioCreador())){
+            if (usuarios.get(i).getNombre().equals(tarea.getUsuarioCreador())) {
                 idCreador = usuarios.get(i).getId();
             }
         }
