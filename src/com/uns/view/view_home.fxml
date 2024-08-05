@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.collections.*?>
+<?import javafx.beans.property.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.uns.controller.ControllerViewTareas">
+
+    <!-- Cabecera -->
+    <top>
+        <ToolBar>
+            <Button fx:id="addButton" text="Add Task" onAction="#handleAddTask"/>
+            <Button fx:id="editButton" text="Edit Task" onAction="#handleEditTask"/>
+            <Button fx:id="deleteButton" text="Delete Task" onAction="#handleDeleteTask"/>
+        </ToolBar>
+    </top>
+
+    <!-- Tabla de Tareas -->
+    <center>
+        <TableView fx:id="tasksTableView">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
+                <TableColumn fx:id="titleColumn" text="Title" prefWidth="150" />
+                <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200" />
+                <TableColumn fx:id="creationDateColumn" text="Creation Date" prefWidth="150" />
+                <TableColumn fx:id="dueDateColumn" text="Due Date" prefWidth="150" />
+                <TableColumn fx:id="completionDateColumn" text="Completion Date" prefWidth="150" />
+                <TableColumn fx:id="creatorColumn" text="Creator" prefWidth="100" />
+                <TableColumn fx:id="responsibleColumn" text="Responsible" prefWidth="100" />
+                <TableColumn fx:id="completedColumn" text="Completed" prefWidth="100" />
+                <TableColumn fx:id="priorityColumn" text="Priority" prefWidth="100" />
+                <TableColumn fx:id="tagsColumn" text="Tags" prefWidth="200" />
+            </columns>
+        </TableView>
+    </center>
+
+</BorderPane>
