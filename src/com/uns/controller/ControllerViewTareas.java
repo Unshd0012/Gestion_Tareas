@@ -104,17 +104,17 @@ public class ControllerViewTareas {
             mostrarDetallesTarea(newValue);
         });
 
-        // Inicializar los valores de los ComboBox
+
         completedComboBox.setItems(FXCollections.observableArrayList("true", "false"));
         priorityComboBox.setItems(FXCollections.observableArrayList("ALTA", "MEDIA", "BAJA"));
 
-        // Inicializar valores para las horas y minutos
+
         ObservableList<Integer> hours = FXCollections.observableArrayList();
         for (int i = 0; i < 24; i++) {
             hours.add(i);
         }
         ObservableList<Integer> minutes = FXCollections.observableArrayList();
-        for (int i = 0; i < 60; i += 5) { // incrementos de 5 minutos
+        for (int i = 0; i < 60; i += 5) {
             minutes.add(i);
         }
         dueHourPicker.setItems(hours);
@@ -124,12 +124,11 @@ public class ControllerViewTareas {
     }
 
     private void configurarColumnas() {
-        // Configurar columnas
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
 
-        // Configurar las columnas de fecha con formateo
+
         creationDateColumn.setCellValueFactory(cellData -> cellData.getValue().fechaCreacionProperty());
         creationDateColumn.setCellFactory(column -> new TableCell<Tarea, LocalDateTime>() {
             @Override
@@ -163,7 +162,6 @@ public class ControllerViewTareas {
         priorityColumn.setCellValueFactory(new PropertyValueFactory<>("prioridad"));
         tagsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.join(", ", cellData.getValue().getEtiquetas())));
 
-        // Configurar la celda personalizada para la columna 'completedColumn'
         completedColumn.setCellFactory(column -> new TableCell<Tarea, Boolean>() {
             @Override
             protected void updateItem(Boolean item, boolean empty) {
@@ -178,7 +176,6 @@ public class ControllerViewTareas {
             }
         });
 
-        // Configurar la celda personalizada para la columna 'priorityColumn' con Enum
         priorityColumn.setCellFactory(column -> new TableCell<Tarea, Tarea.Prioridad>() {
             @Override
             protected void updateItem(Tarea.Prioridad item, boolean empty) {
@@ -187,7 +184,7 @@ public class ControllerViewTareas {
                     setText("");
                     setStyle("");
                 } else {
-                    setText(item.name()); // O item.toString() si deseas otro formato
+                    setText(item.name());
                     switch (item) {
                         case ALTA:
                             setStyle("-fx-background-color: red; -fx-text-fill: white;");
@@ -215,11 +212,10 @@ public class ControllerViewTareas {
                     setText("");
                     setStyle("");
                 } else {
-                    // Realiza la consulta en un hilo separado
                     Task<Usuario> task = new Task<Usuario>() {
                         @Override
                         protected Usuario call() throws SQLException {
-                            UsuariosDAO userDAO = new UsuariosDAO(Conexion.getInstance().getConnection());
+                            UsuariosDAO userDAO = new UsuariosDAO();
                             return userDAO.obtenerUsuarioPorId(Integer.parseInt(userId));
                         }
                     };
@@ -245,14 +241,11 @@ public class ControllerViewTareas {
             }
         });
 
-        // Configurar la tabla
         tasksTableView.setItems(tareasList);
         tasksTableView.setEditable(true);
-
-        // Configurar edición en la tabla si es necesario
         titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        // Otros configuraciones de edición según sea necesario
+
     }
 
     private void loadDataFromDatabase() {
@@ -304,7 +297,6 @@ public class ControllerViewTareas {
 
     @FXML
     private void handleAddTask() {
-        // Implementación del manejo para añadir una nueva tarea
         Dialog<Tarea> dialog = new Dialog<>();
         dialog.setTitle("Add New Task");
         dialog.setHeaderText("Enter Task Details");
@@ -384,11 +376,9 @@ public class ControllerViewTareas {
                 LocalTime completionTime = completionDate != null ? LocalTime.of(completionHourPicker.getValue(), completionMinutePicker.getValue(), 0) : null;
                 LocalDateTime completionDateTime = completionDate != null ? LocalDateTime.of(completionDate, completionTime) : null;
 
-                // Crear un formato para fecha y hora hasta segundos
+
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-                // Obtener la fecha y hora actual como una cadena con el formato deseado
                 String nowFormatted = LocalDateTime.now().format(formatter);
-                // Convertir la cadena de nuevo a LocalDateTime
                 LocalDateTime nowWithSeconds = LocalDateTime.parse(nowFormatted, formatter);
 
                return new Tarea(0,
@@ -444,7 +434,7 @@ public class ControllerViewTareas {
         }
     }
 
-    // Método para permitir o deshabilitar la edición de campos
+
     private void setEditableFields(boolean editable) {
         titleField.setEditable(editable);
         descriptionField.setEditable(editable);
@@ -458,6 +448,7 @@ public class ControllerViewTareas {
         completedComboBox.setDisable(!editable);
         priorityComboBox.setDisable(!editable);
         tagsField.setEditable(editable);
+        creatorField.setEditable(editable);
     }
 
     private void saveChanges() {
@@ -481,7 +472,6 @@ public class ControllerViewTareas {
             String[] tagsArray = tags.split(",");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-            // Crear un nuevo objeto Tarea con los valores actualizados
             String fechaC = creationDateField.getText();
             System.out.println("fechaC = " + fechaC);
             String newF = fechaC.replace(" ","T");
@@ -501,9 +491,7 @@ public class ControllerViewTareas {
                     Arrays.asList(tagsArray)
             );
 
-            // Llamar al método de actualización del DAO o servicio correspondiente
             tareaDAO.updateTarea(updatedTarea);
-
             tasksTableView.getItems().remove(0,tasksTableView.getItems().size());
             tasksTableView.refresh();
             loadDataFromDatabase();
@@ -523,22 +511,19 @@ public class ControllerViewTareas {
         String id = idField.getText();
 
         if (id != null && !id.isEmpty()) {
-            // Crear un cuadro de diálogo de confirmación
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmación de eliminación");
             alert.setHeaderText("¿Estás seguro de que quieres eliminar esta tarea?");
             alert.setContentText("Tarea ID: " + id + " -> "+titleField.getText());
 
-            // Mostrar el cuadro de diálogo y esperar la respuesta del usuario
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                // El usuario confirmó la eliminación
+
                 tareaDAO.deleteTarea(Integer.parseInt(id));
                 tasksTableView.getItems().remove(0,tasksTableView.getItems().size());
                 tasksTableView.refresh();
                 loadDataFromDatabase();
             } else {
-                // El usuario canceló la eliminación
                 System.out.println("Eliminación cancelada por el usuario.");
             }
         } else {

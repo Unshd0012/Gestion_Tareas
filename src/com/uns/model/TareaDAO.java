@@ -9,61 +9,59 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TareaDAO {
+public class TareaDAO extends AbstractDAO implements ActionsTask {
 
-
-    // Formato de fecha y hora ajustado para coincidir con el formato de la base de datos
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter FORMATTER2 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // Método para obtener todas las tareas
+    @Override
     public List<Tarea> getAllTareas() {
         List<Tarea> tareas = new ArrayList<>();
         String query = "SELECT * FROM Tarea";
 
-        try {
-            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
-            ResultSet rs = pstmt.executeQuery();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 Tarea tarea = extractTareaFromResultSet(rs);
                 tareas.add(tarea);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return tareas;
     }
 
-    // Método para obtener una tarea por su ID
+    @Override
     public Tarea getTareaById(int id) {
         Tarea tarea = null;
         String query = "SELECT * FROM Tarea WHERE id = ?";
 
-        try {
-            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     tarea = extractTareaFromResultSet(rs);
                 }
+                closeResources(rs);
             }
+            closeResources(pstmt,conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return tarea;
     }
 
-    // Método para agregar una tarea
+    @Override
     public void addTarea(Tarea tarea) {
         String query = "INSERT INTO Tarea (titulo, descripcion, fechaCreacion, fechaVencimiento, fechaFinalizacion, usuarioCreador, usuarioResponsable, completada, prioridad, etiquetas) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try {
-            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             setTareaParameters(pstmt, tarea);
             pstmt.executeUpdate();
@@ -72,15 +70,16 @@ public class TareaDAO {
         }
     }
 
-    // Método para actualizar una tarea
+    @Override
     public void updateTarea(Tarea tarea) {
         String query = "UPDATE Tarea SET titulo = ?, descripcion = ?, fechaCreacion = ?, fechaVencimiento = ?, fechaFinalizacion = ?, usuarioCreador = ?, usuarioResponsable = ?, completada = ?, prioridad = ?, etiquetas = ? " +
                 "WHERE id = ?";
 
-        try {
-            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             setTareaParameters(pstmt, tarea);
+            pstmt.setInt(6,Integer.parseInt(tarea.getUsuarioCreador()));
             pstmt.setInt(11, tarea.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -88,12 +87,12 @@ public class TareaDAO {
         }
     }
 
-    // Método para eliminar una tarea
+    @Override
     public void deleteTarea(int id) {
         String query = "DELETE FROM Tarea WHERE id = ?";
 
-        try {
-            PreparedStatement pstmt = Conexion.getInstance().getConnection().prepareStatement(query);
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
@@ -102,13 +101,11 @@ public class TareaDAO {
         }
     }
 
-    // Método para extraer una tarea desde un ResultSet
     private Tarea extractTareaFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String titulo = rs.getString("titulo");
         String descripcion = rs.getString("descripcion");
 
-        // Obtener la fecha como String
         String fechaCreacionStr = rs.getString("fechaCreacion");
         LocalDateTime fechaCreacion = parseDateTime(fechaCreacionStr);
 
@@ -129,32 +126,31 @@ public class TareaDAO {
                 usuarioCreador, usuarioResponsable, completada, prioridad, etiquetas);
     }
 
-    // Método para convertir un String a LocalDateTime
     private LocalDateTime parseDateTime(String dateTimeStr) {
         if (dateTimeStr != null && !dateTimeStr.isEmpty()) {
             try {
                 return LocalDateTime.parse(dateTimeStr, FORMATTER);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return LocalDateTime.parse(dateTimeStr, FORMATTER2);
             }
         }
         return null;
     }
 
-    // Método para establecer los parámetros de una tarea en un PreparedStatement
     private void setTareaParameters(PreparedStatement pstmt, Tarea tarea) throws SQLException {
         pstmt.setString(1, tarea.getTitulo());
         pstmt.setString(2, tarea.getDescripcion());
         pstmt.setObject(3, tarea.getFechaCreacion());
         pstmt.setObject(4, tarea.getFechaVencimiento());
         pstmt.setObject(5, tarea.getFechaFinalizacion());
-        List<Usuario> usuarios = new UsuariosDAO(Conexion.getInstance().getConnection()).obtenerTodosLosUsuarios();
-        int idCreador = 0;
-        for (int i = 0; i < usuarios.size(); i++) {
-            if (usuarios.get(i).getNombre().equals(tarea.getUsuarioCreador())) {
-                idCreador = usuarios.get(i).getId();
-            }
-        }
+
+        List<Usuario> usuarios = new UsuariosDAO().obtenerTodosLosUsuarios();
+        int idCreador = usuarios.stream()
+                .filter(usuario -> usuario.getNombre().equals(tarea.getUsuarioCreador()))
+                .map(Usuario::getId)
+                .findFirst()
+                .orElse(0);
+
         pstmt.setInt(6, idCreador);
         pstmt.setInt(7, tarea.getUsuarioResponsable());
         pstmt.setBoolean(8, tarea.isCompletada());
@@ -162,7 +158,6 @@ public class TareaDAO {
         pstmt.setString(10, String.join(", ", tarea.getEtiquetas()));
     }
 
-    // Método para parsear etiquetas desde una cadena
     private List<String> parseEtiquetas(String etiquetasStr) {
         List<String> etiquetas = new ArrayList<>();
         if (etiquetasStr != null && !etiquetasStr.isEmpty()) {

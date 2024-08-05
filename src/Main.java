@@ -12,9 +12,6 @@ import java.util.Objects;
 
 public class Main extends Application {
 
-    public static Conexion con = Conexion.getInstance();
-    public static Connection conexion = con.getConnection();
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -31,7 +28,7 @@ public class Main extends Application {
             primaryStage.setScene(sceneMain);
             primaryStage.getIcons().add(new Image("/com/uns/res/img/to-do-list.png"));
             primaryStage.setResizable(false);
-            primaryStage.setTitle("Tareas");
+            primaryStage.setTitle("Gestion de Tareas");
             primaryStage.show();
             controllerViewMain.setStage(primaryStage);
         }catch (Exception e){

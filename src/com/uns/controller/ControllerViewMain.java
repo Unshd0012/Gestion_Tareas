@@ -36,7 +36,6 @@ public class ControllerViewMain {
 
     @FXML
     private void initialize() {
-        // Cargar la imagen
         Image logoImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/uns/res/img/task.png")));
         logoImageView.setImage(logoImage);
     }
@@ -50,9 +49,8 @@ public class ControllerViewMain {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Conectar a la base de datos
-        try (Connection connection = Conexion.getInstance().getConnection()) {
-            UsuariosDAO usuariosDao = new UsuariosDAO(connection);
+        try  {
+            UsuariosDAO usuariosDao = new UsuariosDAO();
             Usuario usuario = usuariosDao.obtenerUsuarioPorUsername(username);
 
             if (usuario != null && usuario.getPassword().equals(password)) {
@@ -65,7 +63,7 @@ public class ControllerViewMain {
                // showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
                 setMessageLogin("Login Failed - Invalid username or password.");
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
            // showAlert(Alert.AlertType.ERROR, "Database Error", "An error occurred while accessing the database.");
             setMessageLogin( "Database Error - An error occurred while accessing the database.");

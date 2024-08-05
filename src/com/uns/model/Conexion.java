@@ -21,7 +21,7 @@ public class Conexion {
         }
     }
 
-    // Método estático para obtener la instancia única de la clase
+
     public static Conexion getInstance() {
         if (instance == null) {
             instance = new Conexion();
@@ -35,7 +35,7 @@ public class Conexion {
         return instance;
     }
 
-    // Método para obtener la conexión
+
     public Connection getConnection() {
         return connection;
     }

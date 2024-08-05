@@ -1,21 +1,21 @@
 package com.uns.model;
 
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuariosDAO {
-    private Connection connection;
+public class UsuariosDAO extends AbstractDAO implements ActionsUsers {
 
-    public UsuariosDAO(Connection connection) {
-        this.connection = connection;
+
+    public UsuariosDAO() {
+
     }
 
-    // Método para agregar un usuario
+
+    @Override
     public boolean agregarUsuario(Usuario usuario) {
         String sql = "INSERT INTO usuarios (nombre, apellido, correo, password, user) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getApellido());
             pstmt.setString(3, usuario.getCorreo());
@@ -28,10 +28,11 @@ public class UsuariosDAO {
         }
     }
 
-    // Método para obtener un usuario por id
+
+    @Override
     public Usuario obtenerUsuarioPorId(int id) {
         String sql = "SELECT * FROM usuarios WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -43,11 +44,12 @@ public class UsuariosDAO {
         return null;
     }
 
-    // Método para obtener todos los usuarios
+
+    @Override
     public List<Usuario> obtenerTodosLosUsuarios() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuarios";
-        try (Statement stmt = connection.createStatement();
+        try (Statement stmt = getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 usuarios.add(mapearUsuario(rs));
@@ -58,10 +60,11 @@ public class UsuariosDAO {
         return usuarios;
     }
 
-    // Método para actualizar un usuario
+
+    @Override
     public boolean actualizarUsuario(Usuario usuario) {
         String sql = "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, password = ?, user = ? WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNombre());
             pstmt.setString(2, usuario.getApellido());
             pstmt.setString(3, usuario.getCorreo());
@@ -75,10 +78,11 @@ public class UsuariosDAO {
         }
     }
 
-    // Método para eliminar un usuario
+
+    @Override
     public boolean eliminarUsuario(int id) {
         String sql = "DELETE FROM usuarios WHERE id = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -87,20 +91,11 @@ public class UsuariosDAO {
         }
     }
 
-    // Método auxiliar para mapear un ResultSet a un objeto Usuario
-    private Usuario mapearUsuario(ResultSet rs) throws SQLException {
-        Usuario usuario = new Usuario();
-        usuario.setId(rs.getInt("id"));
-        usuario.setNombre(rs.getString("nombre"));
-        usuario.setApellido(rs.getString("apellido"));
-        usuario.setCorreo(rs.getString("correo"));
-        usuario.setPassword(rs.getString("password"));
-        usuario.setUser(rs.getString("user"));
-        return usuario;
-    }
+
+    @Override
     public Usuario obtenerUsuarioPorUsername(String username) {
         String sql = "SELECT * FROM usuarios WHERE user = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = getConnection().prepareStatement(sql)) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -113,4 +108,14 @@ public class UsuariosDAO {
     }
 
 
+    private Usuario mapearUsuario(ResultSet rs) throws SQLException {
+        Usuario usuario = new Usuario();
+        usuario.setId(rs.getInt("id"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setApellido(rs.getString("apellido"));
+        usuario.setCorreo(rs.getString("correo"));
+        usuario.setPassword(rs.getString("password"));
+        usuario.setUser(rs.getString("user"));
+        return usuario;
+    }
 }

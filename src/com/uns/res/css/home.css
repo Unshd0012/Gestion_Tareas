@@ -1,0 +1,85 @@
+/* Estilo para toda la aplicación */
+.root {
+    -fx-font-family: "Arial";
+}
+
+/* Estilo para el ToolBar */
+.tool-bar {
+    -fx-background-color: #96c6f8;
+}
+
+.tool-bar .button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-border-color: #336699;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px 10px;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 2 , 0 );
+}
+
+.tool-bar .button:hover {
+    -fx-background-color: #336699;
+    -fx-text-fill: #000000;
+}
+
+/* Estilo para la TableView */
+.table-view {
+    -fx-table-cell-border-color: #000000;
+    -fx-padding: 10px;
+    -fx-background-color: #6cb1ff;
+}
+
+.table-view .column-header {
+    -fx-background-color: #6cb1ff;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.table-view .cell {
+    -fx-background-color: #e3f2fd;
+    -fx-border-color: #90caf9;
+    -fx-text-fill: #000000;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}
+
+/* Estilo para el HBox en el ScrollPane */
+#taskDetailsPane {
+    -fx-padding: 10px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+/* Estilo para los Labels */
+.label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-padding: 5px;
+}
+
+/* Estilo para los TextFields */
+.text-field {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px;
+}
+
+/* Estilo para los DatePickers */
+.date-picker {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 3px;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.6) , 8, 0.0,0.0,0.0);
+}
+
+/* Estilo para los ComboBoxes */
+.combo-box {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 3px;
+}
