@@ -2,6 +2,26 @@
 
 Este proyecto es una aplicación de gestión de tareas desarrollada con JavaFX. Permite a los usuarios agregar, editar, eliminar y visualizar tareas. La aplicación utiliza una base de datos para almacenar información sobre las tareas y los usuarios.
 
+---
+
+## Vista Previa
+
+A continuación, se presentan capturas de pantalla de algunas funcionalidades de la aplicación:
+
+### Inicio de Sesión
+![Inicio de Sesión](img/login.png)
+
+### Página Principal
+![Página Principal](img/home.png)
+
+### Agregar Tarea
+![Agregar Tarea](img/add_task.png)
+
+### Eliminar Tarea
+![Eliminar Tarea](img/delete_task.png)
+
+---
+
 ## Estructura del Proyecto
 
 El proyecto se organiza en los siguientes paquetes y archivos:
@@ -31,6 +51,8 @@ El proyecto se organiza en los siguientes paquetes y archivos:
 - **META-INF**: Contiene archivos de configuración y metadatos.
 - **Main**: Clase principal para iniciar la aplicación.
 
+---
+
 ## Funcionalidades
 
 ### Gestión de Tareas
@@ -48,6 +70,8 @@ El proyecto se organiza en los siguientes paquetes y archivos:
 - **Actualizar Usuario**: Permite actualizar la información de un usuario existente.
 - **Eliminar Usuario**: Permite eliminar un usuario por su ID.
 
+---
+
 ## Uso de la Programación Orientada a Objetos (POO)
 
 Este proyecto hace un uso de los conceptos de POO:
@@ -63,11 +87,15 @@ Este proyecto hace un uso de los conceptos de POO:
 - **Principio de Responsabilidad Única (SRP)**:
     - Cada clase tiene una única responsabilidad, por ejemplo, `TareaDAO.java` se encarga exclusivamente de las operaciones de acceso a datos para las tareas, mientras que `UsuariosDAO.java` maneja las operaciones para los usuarios.
 
+---
+
 ## Cómo Ejecutar el Proyecto
 
 1. **Configurar la Base de Datos**: Asegúrate de tener una base de datos configurada y actualiza los detalles de conexión en `Conexion.java`.
 2. **Compilar y Ejecutar**: Compila el proyecto y ejecuta la aplicación desde tu IDE.
 3. **Interfaz de Usuario**: Usa la interfaz de usuario para gestionar tareas y usuarios.
+
+---
 
 ## Configuración de la Base de Datos
 
@@ -112,12 +140,17 @@ Este proyecto utiliza SQLite como sistema de gestión de base de datos. Se detal
       ```
     - En el prompt de SQLite, ejecuta los comandos SQL proporcionados anteriormente para crear las tablas `Tarea` y `Usuarios`.
 
+---
+
 ## Requisitos
 
-- **Java**: JDK 8 .
+- **Java**: JDK 8 o superior.
 - **JavaFX**: JavaFX SDK.
 - **Base de Datos**: SQLite.
+
+---
 
 ## Autor
 
 Este proyecto fue desarrollado por Jesus Torres y Michelle Chavez.
+
